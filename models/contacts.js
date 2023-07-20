@@ -41,13 +41,26 @@ const addContact = async (body) => {
   return newContact;
 };
 
-const updateContact = async (contactId, body) => {
+const updateContact = async (contactId, updatedFields) => {
   const contacts = await listContacts();
-  const index = contacts.findIndex((item) => item.id === contactId);
+  const index = contacts.findIndex(
+    (item) => item.id === contactId || item.contactId === contactId
+  );
   if (index === -1) {
     return null;
   }
-  contacts[index] = { contactId, ...body };
+
+  // Перевірте, які поля були надіслані в запиті і дозвольте змінювати тільки їх
+  if (updatedFields.name) {
+    contacts[index].name = updatedFields.name;
+  }
+  if (updatedFields.email) {
+    contacts[index].email = updatedFields.email;
+  }
+  if (updatedFields.phone) {
+    contacts[index].phone = updatedFields.phone;
+  }
+
   await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
   return contacts[index];
 };
