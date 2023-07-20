@@ -1,6 +1,6 @@
 const fs = require("fs/promises");
 const path = require("path");
-const nanoid  = require("nanoid");
+const { nanoid } = require("nanoid");
 
 const contactsPath = path.join(__dirname, "contacts.json");
 
@@ -11,17 +11,13 @@ const listContacts = async () => {
 
 const getContactById = async (contactId) => {
   const contacts = await listContacts();
-  const result = contacts.find(
-    (item) => item.id === contactId 
-  );
+  const result = contacts.find((item) => item.id === contactId);
   return result || null;
 };
 
 const removeContact = async (contactId) => {
   const contacts = await listContacts();
-  const index = contacts.findIndex(
-    (item) => item.id === contactId 
-  );
+  const index = contacts.findIndex((item) => item.id === contactId);
   if (index === -1) {
     return null;
   }
@@ -41,27 +37,14 @@ const addContact = async (body) => {
   return newContact;
 };
 
-const updateContact = async (contactId, updatedFields) => {
+const updateContact = async (contactId, body) => {
   const contacts = await listContacts();
-  const index = contacts.findIndex(
-    (item) => item.id === contactId || item.contactId === contactId
-  );
+  const index = contacts.findIndex((contact) => contact.id === contactId);
   if (index === -1) {
     return null;
   }
-
-  // Перевірте, які поля були надіслані в запиті і дозвольте змінювати тільки їх
-  if (updatedFields.name) {
-    contacts[index].name = updatedFields.name;
-  }
-  if (updatedFields.email) {
-    contacts[index].email = updatedFields.email;
-  }
-  if (updatedFields.phone) {
-    contacts[index].phone = updatedFields.phone;
-  }
-
-  await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
+  contacts[index] = { ...contacts[index], ...body };
+  await writeContacts(contacts);
   return contacts[index];
 };
 
