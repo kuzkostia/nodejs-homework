@@ -36,12 +36,19 @@ const addSchema = Joi.object({
   favorite: Joi.boolean(),
 });
 
+const updateSchema = Joi.object({
+  name: Joi.string(),
+  email: Joi.string().email(),
+  phone: Joi.string(),
+});
+
 const updateFavoriteSchema = Joi.object({
   favorite: Joi.boolean().required(),
 });
 
 const schemas = {
   addSchema,
+  updateSchema,
   updateFavoriteSchema,
 };
 
