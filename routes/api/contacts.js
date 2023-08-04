@@ -17,7 +17,7 @@ router.put(
   "/:contactId",
   authorization,
   isValidId,
-  validateBody(schemas.addSchema),
+  validateBody(schemas.updateSchema),
   ctrl.updateById
 );
 
