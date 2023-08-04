@@ -5,23 +5,27 @@ const getAll = async (req, res) => {
   const { _id: owner } = req.user;
   const { page = 1, limit = 20, favorite } = req.query;
   const skip = (page - 1) * limit;
-  const allContacts = await Contact.find({ owner }, "", { skip, limit });
 
-  let favoriteContacts;
+  let query = { owner };
+
   if (favorite === "true") {
-    favoriteContacts = allContacts.filter((item) => item.favorite === true);
+    query.favorite = true;
   } else if (favorite === "false") {
-    favoriteContacts = allContacts.filter((item) => item.favorite === false);
-  } else {
-    favoriteContacts = allContacts;
+    query.favorite = false;
   }
 
-  res.status(200).json(favorite ? favoriteContacts : allContacts);
+  const allContacts = await Contact.find(query)
+    .skip(skip)
+    .limit(parseInt(limit));
+
+  res.status(200).json(allContacts);
 };
 
 const getById = async (req, res) => {
   const { contactId } = req.params;
-  const result = await Contact.findById(contactId);
+  const { _id: owner } = req.user;
+
+  const result = await Contact.findOne({ _id: contactId, owner });
   if (!result) {
     throw HttpError(404, "Not Found");
   }
